@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon clone de TikTok</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #000;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: white;
+        }
+
+        .video-feed {
+            height: 100vh;
+            width: 100vw;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scrollbar-width: none; /* Cache la barre de défilement pour Firefox */
+            -ms-overflow-style: none; /* Cache la barre de défilement pour IE et Edge */
+        }
+        .video-feed::-webkit-scrollbar {
+            display: none; /* Cache la barre de défilement pour Chrome, Safari, etc. */
+        }
+
+        .video-container {
+            height: 100vh;
+            width: 100vw;
+            scroll-snap-align: start;
+            position: relative; /* Ajouté pour le positionnement de la vidéo */
+        }
+
+        video {
+            height: 100%;
+            object-fit: cover;
+            position: absolute; /* Ajouté pour le centrage */
+            top: 50%; /* Ajouté pour le centrage */
+            left: 50%; /* Ajouté pour le centrage */
+            transform: translate(-50%, -50%); /* Ajouté pour le centrage */
+            border-radius: 15px; /* Arrondi léger des coins */
+        }
+
+        .ui-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 20px;
+            box-sizing: border-box;
+            background: linear-gradient(to top, rgba(0,0,0,0.5), rgba(0,0,0,0));
+        }
+
+        .video-info {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+
+        .video-info p {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .video-info .user {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .side-buttons {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .side-buttons button {
+            background: none;
+            border: none;
+            color: white;
+            padding: 15px 0;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .side-buttons svg {
+            width: 30px;
+            height: 30px;
+            margin-bottom: 5px;
+        }
+
+        .ui-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-weight: bold;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="video-feed">
+        <!-- Les vidéos seront ajoutées ici par JavaScript -->
+    </div>
+
+    <script>
+        const videoFeed = document.querySelector('.video-feed');
+
+        // IMPORTANT : Mettez les chemins de vos vidéos ici
+        const videos = [
+            { src: 'videos/video1.mp4', user: 'utilisateur_cool', description: 'Une vidéo incroyable !' },
+            { src: 'videos/video2.mp4', user: 'chat_ninja', description: 'Mon chat fait des figures...' },
+            { src: 'videos/video3.mp4', user: 'dev_fou', description: 'Un code qui marche à la perfection.' }
+            // Ajoutez d'autres vidéos en suivant ce format
+        ];
+
+        function createVideoElement(videoData) {
+            const container = document.createElement('div');
+            container.className = 'video-container';
+
+            const video = document.createElement('video');
+            video.src = videoData.src;
+            video.loop = true;
+            video.muted = true;
+            video.setAttribute('playsinline', '');
+
+            const uiOverlay = document.createElement('div');
+            uiOverlay.className = 'ui-overlay';
+
+            const logo = document.createElement('div');
+            logo.className = 'logo';
+            logo.textContent = 'TikTok';
+
+            const uiContent = document.createElement('div');
+            uiContent.className = 'ui-content';
+
+            const videoInfo = document.createElement('div');
+            videoInfo.className = 'video-info';
+            const userPara = document.createElement('p');
+            userPara.className = 'user';
+            userPara.textContent = `@${videoData.user}`;
+            const descPara = document.createElement('p');
+            descPara.textContent = videoData.description;
+            videoInfo.appendChild(userPara);
+            videoInfo.appendChild(descPara);
+
+            const sideButtons = document.createElement('div');
+            sideButtons.className = 'side-buttons';
+
+            const likeButton = document.createElement('button');
+            likeButton.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5A5.4 5.4 0 017.5 3c1.74 0 3.41.81 4.5 2.09A5.4 5.4 0 0116.5 3c3.04 0 5.5 2.46 5.5 5.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+                <span>Like</span>
+            `;
+            const commentButton = document.createElement('button');
+            commentButton.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z"/>
+                </svg>
+                <span>Comment</span>
+            `;
+
+            sideButtons.appendChild(likeButton);
+            sideButtons.appendChild(commentButton);
+
+            uiContent.appendChild(videoInfo);
+            uiContent.appendChild(sideButtons);
+
+            uiOverlay.appendChild(logo);
+            uiOverlay.appendChild(uiContent);
+            
+            container.appendChild(video);
+            container.appendChild(uiOverlay);
+
+            return container;
+        }
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const video = entry.target.querySelector('video');
+                if (entry.isIntersecting) {
+                    video.play();
+                } else {
+                    video.pause();
+                    video.currentTime = 0;
+                }
+            });
+        }, {
+            threshold: 0.8
+        });
+
+        videos.forEach(videoData => {
+            const videoElement = createVideoElement(videoData);
+            videoFeed.appendChild(videoElement);
+            observer.observe(videoElement);
+        });
+    </script>
+</body>
+</html>
